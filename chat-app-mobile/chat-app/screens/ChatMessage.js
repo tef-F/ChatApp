@@ -1,5 +1,14 @@
 import * as React from "react";
-import { View, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
+
 import {
   Button,
   TextInput,
@@ -9,16 +18,19 @@ import {
   List,
 } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import AvatarItem from "../AvatarItem";
-import { theme } from "../../theme";
+import AvatarItem from "../components/AvatarItem";
+import { theme } from "../theme";
+import MessageBottomBar from "../components/message/MessageBottomBar";
+import ChatMessageList from "../components/message/ChatMessageList";
+import ChatConversationList from "../components/conversation/ChatConversationList";
 
 const ChatMessage = ({ route, navigation: { goBack } }) => {
   const { itemId, userInfo } = route.params;
   // const navigation = useNavigation();
   const _handleMore = () => console.log("Shown more");
   return (
-    <View style={styles.container}>
-      <Appbar.Header elevated={true} >
+    <SafeAreaView style={styles.container}>
+      <Appbar.Header elevated={true}>
         <Appbar.BackAction onPress={() => goBack()} />
         <AvatarItem
           style={styles.avatar}
@@ -32,31 +44,37 @@ const ChatMessage = ({ route, navigation: { goBack } }) => {
           <Text style={styles.statusText}>Đang hoạt động</Text>
         </View>
         <View style={styles.btnControl}>
-          
           <IconButton
             style={styles.btnIcon}
             icon="phone"
             iconColor={theme.colors.primary}
-            size={20}
+            size={22}
             onPress={() => console.log("Pressed Call")}
           />
           <IconButton
             icon="information"
             iconColor={theme.colors.primary}
-            size={20}
+            size={22}
             onPress={() => console.log("Pressed Info Message")}
           />
         </View>
-
       </Appbar.Header>
 
-      <View style={{ justifyContent: "center", alignItems: "center", height: 600,}}>
-        <Text>Chat Message! - {itemId}</Text>
-      </View>
-      <View style={styles.chatInputBox}>
+      {/* */}
 
-      </View>
-    </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS == "ios" ? "padding" : "height"}
+        style={styles.wrapper}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          {/* Content message */}
+          <View style={styles.screen}>
+            <ChatMessageList />
+            <MessageBottomBar />
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -64,14 +82,13 @@ export default ChatMessage;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // backgroundColor: "#0068FF",
     flex: 1,
   },
   avatar: {
     marginRight: 10,
   },
   headerText: {
+    width: 200,
     alignContent: "center",
   },
   title: {
@@ -83,13 +100,14 @@ const styles = StyleSheet.create({
   },
   btnControl: {
     flexDirection: "row",
-    marginLeft: 25,
-
   },
-  chatInputBox: {
+
+  wrapper: {
+    flex: 1,
+  },
+  screen: {
+    flex: 1,
     justifyContent: "flex-end",
-    height: 60,
-    backgroundColor: "red",
-    marginBottom:260,
-  }
+    backgroundColor: "#4066a3",
+  },
 });

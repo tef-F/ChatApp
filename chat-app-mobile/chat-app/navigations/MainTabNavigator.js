@@ -5,11 +5,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-import Home from "../screens/Home";
 import Contacts from "../screens/Contacts";
 import { theme } from "../theme";
 
-import HomeStackNavigator  from "./HomeStackNavigator";
+// import HomeStackNavigator  from "./HomeStackNavigator";
+import Home from "../screens/Home";
+
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -23,9 +24,6 @@ function Settings() {
 
 const MainStackNavigator = () => {
   return (
-    <NavigationContainer
-      theme={{ colors: { secondaryContainer: "rgba(52, 52, 52, 0.0)" } }}
-    >
       <Tab.Navigator
         initialRouteName="Home"
         activeColor={theme.colors.primary}
@@ -33,7 +31,7 @@ const MainStackNavigator = () => {
       >
         <Tab.Screen
           name="HomeTab"
-          component={HomeStackNavigator}
+          component={Home}
           options={{
             tabBarLabel: "Chat",
             tabBarBadge: 5,
@@ -75,7 +73,6 @@ const MainStackNavigator = () => {
           }}
         />
       </Tab.Navigator>
-    </NavigationContainer>
   );
 };
 

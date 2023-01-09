@@ -9,6 +9,7 @@ import {
   Pressable,
   Alert,
   StyleSheet,
+  ToastAndroid,
   KeyboardAvoidingView,
   StatusBar,
   TouchableOpacity,
@@ -26,50 +27,62 @@ import {
   HelperText,
 } from "react-native-paper";
 import useIsMountedRef from "../hooks/useIsMountedRef";
-
-import HttpService from "../utils/HttpService";
-const httpservice = new HttpService();
 import { loginValid } from "../utils/validator";
+import useAuth from "../hooks/useAuth";
 
 // Import the app styles
 // import { styles } from "../utils/styles";
 
 const Login = ({ navigation }) => {
-  // const [email, setEmail] = useState();
-  // const [password, setPassword] = useState();
-  // const [checked, setChecked] = React.useState(false);
+  const { login, isAuthenticated, user  } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const isMountedRef = useIsMountedRef();
 
   // checks if the input field is empty
-  const handleSignIn = async (email, password) => {
+  const handleSignIn = async (
+    email,
+    password,
+    { setErrors, setSubmitting, resetForm }
+  ) => {
     // Logs the email to the console
     try {
-      const response = await httpservice.post("/auth/login", {
-        email,
-        password,
-      });
-      const { accessToken, user } = response.data;
-      console.log({ accessToken, user });
-      Alert.alert(
-        "Response Info",
-        `Access Token:${accessToken} \nUser: ${user}`,
-        [
-          {
-            text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel",
-          },
-          { text: "OK", onPress: () => console.log("OK Pressed") },
-        ]
-      );
+      if (isMountedRef.current) {
+        setSubmitting(false);
+      }
+      await login(email, password);
+      // const response = await httpservice.post("/auth/login", {
+      //   email,
+      //   password,
+      // });
+      ToastAndroid.show("Login success!", ToastAndroid.SHORT);
+      //const { accessToken, user } = response.data;
+      console.log(isAuthenticated);
+      console.log(user);
+      
+      // Alert.alert(
+      //   "Response Info",
+      //   `Access Token:${accessToken} \nUser: ${user}`,
+      //   [
+      //     {
+      //       text: "Cancel",
+      //       onPress: () => console.log("Cancel Pressed"),
+      //       style: "cancel",
+      //     },
+      //     { text: "OK", onPress: () => console.log("OK Pressed") },
+      //   ]
+      // );
     } catch (error) {
       console.error(error);
+      resetForm();
+      if (isMountedRef.current) {
+        setSubmitting(false);
+        setErrors({ afterSubmit: error.message });
+      }
     }
   };
 
   const handleShowPasswork = () => {
-    setShowPassword((show) => !show);
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -85,7 +98,13 @@ const Login = ({ navigation }) => {
         <Formik
           initialValues={loginValid.initial}
           validationSchema={loginValid.validationSchema}
-          onSubmit={(values) => handleSignIn(values.email, values.password)}
+          onSubmit={async (values, { setErrors, setSubmitting, resetForm }) =>
+            handleSignIn(values.email, values.password, {
+              setErrors,
+              setSubmitting,
+              resetForm,
+            })
+          }
         >
           {(formikProps) => {
             const {
@@ -104,7 +123,7 @@ const Login = ({ navigation }) => {
                     mode="outlined"
                     style={styles.input}
                     label="Email"
-                    autoFocus
+                    // autoFocus
                     returnKeyType="next"
                     value={values.email}
                     onChangeText={handleChange("email")}
@@ -128,7 +147,7 @@ const Login = ({ navigation }) => {
                     mode="outlined"
                     style={styles.input}
                     label="Password"
-                    keyboardType={showPassword ? "visible-password" : "default"}
+                    secureTextEntry={!showPassword}
                     value={values.password}
                     onChangeText={handleChange("password")}
                     onBlur={handleBlur("password")}
@@ -142,7 +161,6 @@ const Login = ({ navigation }) => {
                       />
                     }
                     error={Boolean(touched.password && errors.password)}
-                    secureTextEntry
                   />
                   <HelperText
                     type="error"
@@ -154,7 +172,7 @@ const Login = ({ navigation }) => {
 
                 <Button
                   style={styles.button}
-                  icon="login"
+                  icon="login-variant"
                   mode="contained"
                   loading={isSubmitting}
                   onPress={handleSubmit}

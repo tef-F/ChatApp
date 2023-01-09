@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from "react-native";
 import { Avatar, Badge } from "react-native-paper";
 
 const AvatarItem = (props) => (
-  <View key={props.key} style={props.style ? props.style :styles.item}>
+  <View key={props.key} style={props.style ? props.style : styles.item}>
     <View>
       <Avatar.Image size={props.size} source={props.src} />
       <Badge

@@ -1,15 +1,20 @@
 import * as React from "react";
-import { View, StyleSheet, SafeAreaView, } from "react-native";
-import { Appbar,  } from "react-native-paper";
+import { View, StyleSheet, SafeAreaView } from "react-native";
+import { Appbar } from "react-native-paper";
 import { theme } from "../theme";
 import ChatConversationList from "../components/conversation/ChatConversationList";
+import useAuth from "../hooks/useAuth";
 
 const Home = ({ navigation }) => {
   const [index, setIndex] = React.useState(0);
+  const { logout } = useAuth();
 
   const _handleSearch = () => console.log("Searching");
 
-  const _handleTune = () => console.log("Tune");
+  const _handleTune = async () => {
+    console.log("Logout");
+    await logout();
+  };
 
   const _handleMore = () => console.log("Shown more");
 
@@ -31,9 +36,9 @@ const Home = ({ navigation }) => {
           <Appbar.Action icon="pen" onPress={_handleMore} style={styles.icon} />
         </Appbar.Header>
       </View>
-        <View style={styles.content}>
-          <ChatConversationList />
-        </View>
+      <View style={styles.content}>
+        <ChatConversationList />
+      </View>
     </SafeAreaView>
   );
 };
